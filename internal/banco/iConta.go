@@ -11,3 +11,7 @@ type Conta interface {
 	Depositr(valor int) error
 	Sacar(valor int) error
 }
+
+type Rendivel interface {
+	RenderJuros(taxa float64)
+}

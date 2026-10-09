@@ -8,14 +8,30 @@ import (
 
 type Corrente struct {
 	Nome                 string
-	Cpf                  cpf.CPF
 	Numero               string
+	Cpf                  cpf.CPF
 	Saldo                int
-	SaldoLimite          int
-	SaldoChequeEspecial  int
 	LimiteChequeEspecial int
 	Tarifa               float64
 	Tipo                 Tipo
+}
+
+func NewCorrente(
+	nome, numero string,
+	cpf cpf.CPF,
+	saldo, limiteChequeEspecial int,
+	tarifa float64,
+	tipo Tipo,
+) *Corrente {
+	return &Corrente{
+		nome,
+		numero,
+		cpf,
+		saldo,
+		limiteChequeEspecial,
+		tarifa,
+		tipo,
+	}
 }
 
 func (cc *Corrente) GetUserInfo() string {
@@ -30,12 +46,18 @@ func (cc *Corrente) GetTipo() Tipo {
 	return cc.Tipo
 }
 
-func (cc *Corrente) Depositar(valor int) error {
-	cc.Saldo += valor
+func (cc *Corrente) Depositar(valor float64) error {
+	cc.Saldo += int(valor * 100)
 	return nil
 }
 
-func (cc *Corrente) Sacar(valor int) error {
-	cc.Saldo -= valor
+func (cc *Corrente) Sacar(valor float64) error {
+	cc.Saldo -= int(valor*100) + int(cc.Tarifa*100)
+
+	if cc.Saldo <= cc.LimiteChequeEspecial {
+		cc.Saldo += int(valor*100) + int(cc.Tarifa*100)
+		return ErrSaldoInsuficiente
+	}
+
 	return nil
 }
